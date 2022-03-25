@@ -1,0 +1,41 @@
+﻿@foreach (Pair p in @Model.Pairs)
+{
+	string divID = "pairDiv" + p.GetHashCode().ToString();
+	<div id="@divID" class="match">
+		<div>
+			<div>Match</div>
+			<div class="">
+				<div class="pair">
+					@foreach (Group g in p.Groups)
+					{
+						<div class="group">
+							@foreach (MyUser u in g.GroupUsers)
+							{
+								<div>@u.Name</div>
+							}
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+		<div>
+			<div>Queue</div>
+			<div id="nextList" class="nextlist">
+				@foreach (Group g in p.Next)
+				{
+					<div class="nextgroup">
+						@{var indexid = p.Next.IndexOf(g) == 0 ? "Next" : @p.Next.IndexOf(g).ToString();}
+						<span class="nextnum">@indexid</span>
+
+
+						@foreach (MyUser u in g.GroupUsers)
+						{
+							<span class="nextuser">@u.Name</span>
+						}
+					</div>
+				}
+			</div>
+		</div>
+
+	</div>
+}

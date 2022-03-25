@@ -1,0 +1,21 @@
+﻿@foreach (Group g in Model.Groups)
+{
+	if(g.InQueue != true) {
+		var tempID = "group_" + @g.ID;
+<div id="@tempID" style="margin-top: 30px;" class="group @(g.GroupUsers.Count >= 4 ? "fullgroup":"")">
+	@foreach (MyUser u in g.GroupUsers)
+	{
+		<div>@u.Name</div>
+	}
+	<div class="joinDiv">
+		<input type="button" class="join btn btn-primary" value="Join" />
+	</div>
+	<div class="readyDiv">
+		<input type="button" class="ready btn btn-primary" value="Ready" />
+	</div>
+	<div class="leaveDiv">
+		<input type="button" class="join btn btn-primary" value="Leave" />
+	</div>
+</div>
+	}
+}

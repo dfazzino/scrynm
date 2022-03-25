@@ -1,0 +1,196 @@
+﻿@page
+@model IndexModel
+@{
+	ViewData["Title"] = "Home page";
+}
+@Html.AntiForgeryToken()
+<div class="text-center">
+	<h1 class="display-4">Welcome</h1>
+	<p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+	<div id="currentPairsDiv" class="pairs">
+		<partial name="_Pairs" for="@Model.currentPairs"/>
+	</div>
+	<div id="groupsDiv">
+		<partial name="_Groups" for="@Model.AllGroups" />
+	</div>
+	<div id="newDiv">
+		<div>
+			Name: <input id="myName">
+		</div>
+	</div>
+</div>
+<style>
+	.pairs {
+		display: flex;
+		padding: 3px;
+		background-color: white;
+		flex-wrap: wrap;
+	}
+
+	.match {
+		display: flex;
+		margin: 20px;
+		border: 1px solid black;
+		width: 45%;
+		background-color: azure;
+		justify-content: space-evenly;
+	}
+
+	.pair {
+		display: flex;
+		padding: 3px;
+		background-color: white;
+		border: 1px solid black;
+		margin: 10px;
+	}
+	#groupsDiv{
+		display: flex;
+	}
+
+
+	.group {
+		border: 1px solid black;
+		margin-left: 4px;
+		width: 150px;
+		background-color: lightgray;
+		padding: 5px;
+	}
+
+		.group.fullgroup .joinDiv {
+			display: none;
+		}
+		.group .readyDiv {
+			display: none;
+		}
+
+		.group.fullgroup .readyDiv {
+			display: block;
+		}
+		.group .leaveDiv{
+			display: none;
+		}
+		.nextlist {
+			border: 1px solid black;
+			margin: 10px;
+			background-color: white;
+		}
+
+	.nextgroup {
+		border: 1px solid black;
+		padding: 2px;
+		margin: 10px;
+	}
+
+	.nextuser {
+		padding: 3px;
+		border-right: 1px solid black;
+		display: inline-block;
+		min-width: 55px;
+	}
+
+		.nextuser:last-child {
+			border-right: 0px solid black;
+		}
+
+	.nextnum {
+		background-color: lightgray;
+		border: 1px black solid;
+	}
+	.fullgroup{
+		background-color: cornflowerblue;
+		border: 1px solid black;
+	}
+
+	@@media (max-width: 1500px) {
+		.match {
+			width: 80%;
+		}
+
+		.pairs {
+			justify-content: center;
+		}
+	}
+</style>
+<script>
+
+
+		$("#myName").on('keyup', function (e) {   //After entering note for the to do task, pressing enter will submit the note to the databaes.
+			if (e.which == 13) {
+				var data = {"Name" : $("#myName").val()}
+				$.ajax({
+					type: "POST",
+					url: "/Index?handler=NewGroup",
+					beforeSend: function (xhr) {
+						xhr.setRequestHeader("XSRF-TOKEN",
+							$('input:hidden[name="__RequestVerificationToken"]').val());
+					}, //or
+					headers: {
+						"XSRF-TOKEN": $('input:hidden[name="__RequestVerificationToken"]').val()
+					},
+					data: data,
+					dataType: "html",
+					success: function (response) {
+						$("#groupsDiv").html(response)
+						addListeners();
+					},
+					error: function (response) {
+						alert(response.d);
+					}
+				});
+			}
+		})
+	function addListeners() {
+		$(".ready").on("click", function (e) {
+			var data = {
+				"GroupID": e.currentTarget.parentElement.parentElement.id
+			}
+			$.ajax({
+				type: "POST",
+				url: "/Index?handler=Ready",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader("XSRF-TOKEN",
+						$('input:hidden[name="__RequestVerificationToken"]').val());
+				}, //or
+				headers: {
+					"XSRF-TOKEN": $('input:hidden[name="__RequestVerificationToken"]').val()
+				},
+				data: data,
+				dataType: "html",
+				success: function (response) {
+					$("#groupsDiv").html(response)
+					addListeners();
+				},
+				error: function (response) {
+					alert(response.d);
+				}
+			});
+		})
+		$(".join").on("click", function (e) {
+			var data = {
+				"Name": $("#myName").val(),
+				"GroupID": e.currentTarget.parentElement.parentElement.id
+			}
+			$.ajax({
+				type: "POST",
+				url: "/Index?handler=JoinGroup",
+				beforeSend: function (xhr) {
+					xhr.setRequestHeader("XSRF-TOKEN",
+						$('input:hidden[name="__RequestVerificationToken"]').val());
+				}, //or
+				headers: {
+					"XSRF-TOKEN": $('input:hidden[name="__RequestVerificationToken"]').val()
+				},
+				data: data,
+				dataType: "html",
+				success: function (response) {
+					$("#groupsDiv").html(response);
+					addListeners();
+				},
+				error: function (response) {
+					alert(response.d);
+				}
+			});
+		})
+	}
+	addListeners();
+</script>
